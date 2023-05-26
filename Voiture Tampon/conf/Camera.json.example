@@ -1,0 +1,13 @@
+[
+    {
+        "Camera": "Name of the camera",
+        "IP": "IP Address",
+        "Quad": 0,
+        "Localisation": [
+            0,
+            0
+        ],
+        "Login": "your camera login",
+        "Password": "your camera password"
+    }
+]
