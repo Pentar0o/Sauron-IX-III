@@ -13,7 +13,7 @@ Check the [README](<./Voiture Ventouse/README.md>) for more details
 ## Authors
 
 - [@Pentar0o](https://www.github.com/Pentar0o)
-- [Swillam](https://www.github.com/Swillam)
+- [@Swillam](https://www.github.com/Swillam)
 
 ## License
 
