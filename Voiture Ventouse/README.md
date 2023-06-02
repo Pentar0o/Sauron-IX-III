@@ -24,5 +24,8 @@ Create a `conf/Camera.json` that contain your camera's informations. For more de
 If you have a camera with multiple lenses (like a Q6010 or Q6100), you can set `Quad` to `true`.
 
 ```bash
-python ./Voiture_Tampon_Multiple_Cameras_Yolo_WithDisplay.py
+   python parked_car_tracker.py <model_path> \n
+   [--confidence <confidence>] \n
+   [--device <device>] \n
+   [--interval <interval>]
 ```
