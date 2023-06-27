@@ -162,9 +162,20 @@ cython_debug/
 # YOLO Models
 *.pt
 
+# Project files
+*.json
+*.jpg
+*.png
+*.jpeg
+*.mov
+*.mp4
+*.avi
+*.zip
+
 # VSCode Extensions
 .vscode/
 .history/
+html/
 
 # Mac
 .DS_Store
