@@ -1,0 +1,13 @@
+{
+  "Teams_webhook": "https://outlook.office.com/webhook/.../IncomingWebhook/.../..."
+  "Cameras": [
+    {
+      "Camera": "",
+      "IP": "",
+      "Quad": 0,
+      "Login": "",
+      "Password": ""
+    }
+  ]
+}
+  

@@ -1,0 +1,11 @@
+boto3==1.26.68
+wheel==0.37.0
+setuptools==58.0.4
+numpy==1.24.3
+opencv_python==4.7.0.68
+Pillow==9.4.0
+pymsteams==0.2.2
+scipy==1.10.1
+torch==2.0.0
+torchvision==0.15.1
+ultralytics==8.0.92
