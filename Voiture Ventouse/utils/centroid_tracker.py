@@ -3,17 +3,16 @@ import logging
 from collections import OrderedDict
 import time
 from scipy.spatial import distance as dist
-from torchvision import transforms
 import torch
 import numpy as np
 
-from .trackable_object import TrackableObject
+from .trackable_object import Point, Rectangle, TrackableObject
 
 
 class CentroidTracker:
     """Centroid Tracker Class"""
 
-    def __init__(self, camera, time_dispappeared=10, similarity=0.8):
+    def __init__(self, camera: str, time_dispappeared:int = 10, similarity:float = 0.8):
         """__init__.
 
         Args:
@@ -23,7 +22,7 @@ class CentroidTracker:
         """
         self.camera = camera
         self.next_object_id = 0
-        self.objects = OrderedDict()
+        self.objects: OrderedDict[int,TrackableObject] = OrderedDict()
         self.similarity = similarity
         self.time_dispappeared = time_dispappeared
 
@@ -66,7 +65,7 @@ class CentroidTracker:
         for i, detection in enumerate(self.objects.values()):
             # Compare overlap with remaining objects
             for j in list_objects_id[i + 1 :]:
-                overlap = calculate_iou(detection.original_rect, self.objects[j].original_rect)
+                overlap = calculate_iou(detection.rect, self.objects[j].rect)
                 #print("Overlap: ", overlap, "for objects: ", detection.object_id, "and ", self.objects[j].object_id)
                 # Remove overlapping rectangle if IoU exceeds threshold
                 if overlap > iou_threshold:
@@ -81,20 +80,23 @@ class CentroidTracker:
         for object_id in remove:
             self.deregister(object_id, "double")
 
-    def rects_to_centroid(self, rects):
+    def rects_to_centroid(self, rects: list[Rectangle]):
         """Convert rects to centroid.
 
         Args:
             rects (list): The list of rects.
+
+        Returns:
+            list: The list of centroids.
         """
         centroids = np.zeros((len(rects), 2), dtype="int")
         for i, (start_x, start_y, end_x, end_y) in enumerate(rects):
             mid_x = int((start_x + end_x) / 2.0)
             mid_y = int((start_y + end_y) / 2.0)
-            centroids[i] = (mid_x, mid_y)
+            centroids[i] = Point(mid_x, mid_y)
         return centroids
 
-    def update(self, rects, cars):
+    def update(self, rects: list[Rectangle], cars: list[torch.Tensor]):
         """Update tracking list.
 
         Args:
@@ -105,9 +107,7 @@ class CentroidTracker:
             list: The list of objects
         """
         if len(rects) == 0:
-            for object_id, car in self.objects.items():
-                car.disappeared += 1
-                car.direction = None
+            for object_id, car in self.objects.copy().items():
                 if time.time() - car.last_apparition > self.time_dispappeared:
                     self.deregister(object_id)
             return self.objects

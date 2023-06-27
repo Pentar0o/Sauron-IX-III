@@ -7,9 +7,11 @@ import time
 import cv2
 import logging
 
+from numpy import ndarray
+
 class VideoBufferThread(Thread):
     """Threaded video buffer."""
-    def __init__(self, rtsp_url, buffer_length=50):
+    def __init__(self, rtsp_url: str, buffer_length=50):
         """Initialize the VideoBufferThread.
 
         Args:
@@ -21,9 +23,9 @@ class VideoBufferThread(Thread):
         self.daemon = True
         self.rtsp_url = rtsp_url
         self.buffer_length = buffer_length
-        self.buffer = deque(maxlen=buffer_length)
+        self.buffer: deque[ndarray] = deque(maxlen=buffer_length)
         self._stop_event = Event()
-        self.retry = 0
+        self.retry = 1
 
     def run(self):
         """Read frames from the RTSP stream."""
@@ -44,25 +46,30 @@ class VideoBufferThread(Thread):
             pass
 
         
-    def start_capture(self):
+    def start_capture(self) -> cv2.VideoCapture :
         cap = None
         try:
             cap = cv2.VideoCapture(self.rtsp_url)
-        except cv2.error:
-            logging.error(f"Error while connecting the RTSP stream: {self.rtsp_url}")
-            logging.error(f"Retry {self.retry}/3")
-            if self.retry < 3:
+            if not cap.isOpened():
+                raise Exception("Cannot open the RTSP stream")
+
+        except Exception as e:
+            logging.error(f"Error while connecting the RTSP stream: {self.rtsp_url}: {e}")
+            if self.retry <= 3:
+                logging.error(f"Retry {self.retry}/3...")
                 self.retry += 1
                 time.sleep(3)
                 self.start_capture()
-            self.stop()
+            else:
+                self.stop()
         finally:
             return cap
 
     def wait_first_frame(self):
         """Wait for the first frame to be added to the buffer."""
-        while len(self.buffer) == 0 or self.stopped():
+        while len(self.buffer) == 0 and not self.stopped():
             sleep(0.01)
+        return not self.stopped()
 
     def stopped(self):
         """Check if the thread has been stopped.
@@ -76,7 +83,8 @@ class VideoBufferThread(Thread):
         """Stop the thread."""
         self._stop_event.set()
 
-    def get_latest_frame(self):
+    @property
+    def latest_frame(self) -> ndarray:
         """Get the latest frame from the buffer.
 
         Returns:
