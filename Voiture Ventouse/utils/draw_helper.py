@@ -1,3 +1,4 @@
+import math
 import time
 from . import TrackableObject
 import cv2
@@ -112,15 +113,17 @@ def display_info(frame, processing_time):
 
     Args:
         frame (ndarray): Frame from the video stream.
-        processing_time (float): Processing time.
-        fps (int): FPS.
+        processing_time (float): Processing time in seconds.
     """
+    FONT_SCALE = 0.0005  # Adjust for larger font size in all images
+    THICKNESS_SCALE = 0.001  # Adjust for larger thickness in all images
+    height, width = frame.shape[:2]
     cv2.putText(
         frame,
-        f"Processing time: {processing_time:.2f} ms",
-        (10, 30),
+        f"Processing time: {processing_time * 1000:.2f} ms",
+        (10, 50),
         cv2.FONT_HERSHEY_SIMPLEX,
-        1,
-        (255, 255, 255),
-        thickness=2,
+        fontScale=min(width, height) * FONT_SCALE,
+        thickness=math.ceil(min(width, height) * THICKNESS_SCALE),
+        color=(0, 0, 255),
     )

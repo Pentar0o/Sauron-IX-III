@@ -28,8 +28,9 @@ import time
 import cv2
 from PIL import Image
 from utils import Camera, YoloDetector
+from utils.draw_helper import display_info, draw_tracks, make_image
 from utils.func import *
-from utils.draw_helper import make_image, draw_tracks
+
 
 def argument_parser():
     """Parse command line arguments.
@@ -106,6 +107,7 @@ def main():
     try:
         while True:
             for camera in cameras:
+                start_time = time.time()
                 logging.debug(f"Processing camera {camera.name}...")
                 images = []
                 nb_cam = 4 if camera.quad else 1
@@ -123,12 +125,15 @@ def main():
                         Exception("No frame or centroid tracker")                    
                     images.append(Image.fromarray(frame))
 
+                processing_time = time.time() - start_time
                 if args.display:
                     # Display the resulting frame
                     if camera.quad:
                         img = make_image(images, camera, args.save)
+                        display_info(img, processing_time)
                         cv2.imshow(f"{camera.name}", img)
                     else:
+                        display_info(images[0], processing_time)
                         cv2.imshow(f"{camera.name}", images[0])
                     # Press Q on keyboard to stop recording
                     if cv2.waitKey(1) & 0xFF == ord("q"):
